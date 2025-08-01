@@ -16,54 +16,6 @@ const ControlPanel = memo(
     const [dragOver, setDragOver] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Debounce utility
-    // const debounce = useCallback(
-    //   <T extends (...args: any[]) => void>(func: T, wait: number) => {
-    //     let timeout: NodeJS.Timeout;
-    //     return (...args: Parameters<T>) => {
-    //       clearTimeout(timeout);
-    //       timeout = setTimeout(() => func(...args), wait);
-    //     };
-    //   },
-    //   []
-    // );
-
-    // const handleUpload = useCallback(
-    //   debounce(async (file: File, type: 'avatar' | 'clothing') => {
-    //     if (!file || uploading) return; // Prevent multiple uploads
-
-    //     // Validate file extension
-    //     if (!file.name.endsWith('.glb') && !file.name.endsWith('.gltf')) {
-    //       setError(`Only .glb or .gltf 3D models are supported for ${type}. Images like .jpg are not valid.`);
-    //       return;
-    //     }
-
-    //     setError(null);
-    //     setUploading(true);
-    //     const formData = new FormData();
-    //     formData.append('file', file);
-
-    //     try {
-    //       console.log(`Starting upload for ${type}:`, file.name); // Debug log
-    //       const res = await fetch(`/api/upload?type=${type}`, {
-    //         method: 'POST',
-    //         body: formData,
-    //       });
-    //       if (!res.ok) throw new Error('Upload failed');
-    //       const { url }: { url: string } = await res.json();
-    //       console.log(`Uploaded ${type} URL:`, url); // Debug log
-    //       if (type === 'avatar') onAvatarUpload(url);
-    //       else onClothingUpload(url);
-    //     } catch (error) {
-    //       setError('Failed to upload file. Please try again.');
-    //       console.error('Upload error:', error);
-    //     } finally {
-    //       setUploading(false);
-    //     }
-    //   }, 300),
-    //   [onAvatarUpload, onClothingUpload, uploading]
-    // );
-
     const handleUpload = useCallback(
       (file: File, type: 'avatar' | 'clothing') => {
         if (!file || uploading) return; // Prevent multiple uploads

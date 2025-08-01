@@ -9,12 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@cloudinary/react": "^1.14.3",
+    "@cloudinary/url-gen": "^1.21.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/material": "^7.2.0",
     "@react-three/drei": "^10.6.1",
     "@react-three/fiber": "^9.3.0",
     "@vercel/blob": "^1.1.1",
+    "cloudinary": "^2.7.0",
     "gltf-loader": "^1.0.0",
     "next": "15.4.5",
     "react": "19.1.0",
