@@ -1,82 +1,82 @@
-import { writeFile, mkdir } from 'fs/promises';
-import { NextResponse } from 'next/server';
-import { join } from 'path';
-
-export async function POST(request: Request) {
-  const type = new URL(request.url).searchParams.get('type') as 'avatar' | 'clothing' | null;
-  if (!type) {
-    return NextResponse.json({ error: 'Type is required' }, { status: 400 });
-  }
-
-  const formData = await request.formData();
-  const file = formData.get('file') as File | null;
-
-  if (!file) {
-    return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
-  }
-
-  // Validate file extension
-  if (!file.name.endsWith('.glb') && !file.name.endsWith('.gltf')) {
-    return NextResponse.json(
-      { error: 'Invalid file type. Only .glb and .gltf files are supported.' },
-      { status: 400 }
-    );
-  }
-
-  const uploadDir = join(process.cwd(), 'public', 'uploads', type);
-  await mkdir(uploadDir, { recursive: true });
-
-  const filePath = join(uploadDir, file.name);
-  const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(filePath, buffer);
-
-  const url = `/uploads/${type}/${file.name}`;
-  return NextResponse.json({ url });
-}
-
+// import { writeFile, mkdir } from 'fs/promises';
 // import { NextResponse } from 'next/server';
-// import { v2 as cloudinary } from 'cloudinary';
-
-// cloudinary.config({
-//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-//   api_key: process.env.CLOUDINARY_API_KEY,
-//   api_secret: process.env.CLOUDINARY_API_SECRET,
-// });
+// import { join } from 'path';
 
 // export async function POST(request: Request) {
+//   const type = new URL(request.url).searchParams.get('type') as 'avatar' | 'clothing' | null;
+//   if (!type) {
+//     return NextResponse.json({ error: 'Type is required' }, { status: 400 });
+//   }
+
 //   const formData = await request.formData();
-//   const file = formData.get('file') as File;
+//   const file = formData.get('file') as File | null;
 
 //   if (!file) {
 //     return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
 //   }
 
+//   // Validate file extension
 //   if (!file.name.endsWith('.glb') && !file.name.endsWith('.gltf')) {
-//     return NextResponse.json({ error: 'Only .glb or .gltf files are supported' }, { status: 400 });
+//     return NextResponse.json(
+//       { error: 'Invalid file type. Only .glb and .gltf files are supported.' },
+//       { status: 400 }
+//     );
 //   }
-  
 
-//   try {
-//     const buffer = await file.arrayBuffer();
-//     const uploadResult = await new Promise((resolve, reject) => {
-//       cloudinary.uploader.upload_stream(
-//         { resource_type: 'raw', upload_preset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET },
-//         (error, result) => {
-//           if (error) reject(error);
-//           else resolve(result);
-//         }
-//       ).end(Buffer.from(buffer));
-//     });
+//   const uploadDir = join(process.cwd(), 'public', 'uploads', type);
+//   await mkdir(uploadDir, { recursive: true });
 
-//     return NextResponse.json({ url: uploadResult.secure_url });
-//   } catch (err) {
-//     console.error('Upload error:', err);
-//     return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });
-//   }
+//   const filePath = join(uploadDir, file.name);
+//   const buffer = Buffer.from(await file.arrayBuffer());
+//   await writeFile(filePath, buffer);
+
+//   const url = `/uploads/${type}/${file.name}`;
+//   return NextResponse.json({ url });
 // }
 
-// export const config = {
-//   api: {
-//     bodyParser: false, // Disable default body parsing for file uploads
-//   },
-// };
+
+
+import { writeFile, mkdir } from 'fs/promises';
+import { join } from 'path';
+import { NextResponse } from 'next/server';
+
+export async function POST(request: Request) {
+  const formData = await request.formData();
+  const file = formData.get('file') as File;
+
+  if (!file) {
+    return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+  }
+
+  if (!file.name.endsWith('.glb') && !file.name.endsWith('.gltf')) {
+    return NextResponse.json({ error: 'Only .glb or .gltf files are supported' }, { status: 400 });
+  }
+
+  const maxSize = 4.5 * 1024 * 1024; // 4.5 MB
+  if (file.size > maxSize) {
+    return NextResponse.json({ error: `File size exceeds 4.5 MB limit (${(file.size / 1024 / 1024).toFixed(2)} MB)` }, { status: 413 });
+  }
+
+  try {
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    const fileName = `${Date.now()}-${file.name}`; 
+    const uploadDir = join(process.cwd(), 'public', 'uploads');
+    await mkdir(uploadDir, { recursive: true }); 
+    const filePath = join(uploadDir, fileName);
+    await writeFile(filePath, buffer);
+
+    const url = `/uploads/${fileName}`; 
+    console.log(`File saved at: ${filePath}, URL: ${url}`);
+    return NextResponse.json({ url });
+  } catch (err) {
+    console.error('Upload error details:', err);
+    return NextResponse.json({ error: 'Failed to upload file. Check server logs for details.' }, { status: 500 });
+  }
+}
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
