@@ -60,13 +60,15 @@ export async function POST(request: Request) {
   try {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const fileName = `${Date.now()}-${file.name}`; 
+    const fileName = `${Date.now()}-${file.name}`; // Unique filename
     const uploadDir = join(process.cwd(), 'public', 'uploads');
-    await mkdir(uploadDir, { recursive: true }); 
+    await mkdir(uploadDir, { recursive: true }); // Attempt to create directory
+
+    // Check if we can write to public directory (will fail on Vercel)
     const filePath = join(uploadDir, fileName);
     await writeFile(filePath, buffer);
 
-    const url = `/uploads/${fileName}`; 
+    const url = `/uploads/${fileName}`; // Relative to public directory
     console.log(`File saved at: ${filePath}, URL: ${url}`);
     return NextResponse.json({ url });
   } catch (err) {
