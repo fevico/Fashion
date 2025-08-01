@@ -14,6 +14,7 @@
     "@mui/material": "^7.2.0",
     "@react-three/drei": "^10.6.1",
     "@react-three/fiber": "^9.3.0",
+    "@vercel/blob": "^1.1.1",
     "gltf-loader": "^1.0.0",
     "next": "15.4.5",
     "react": "19.1.0",
