@@ -170,6 +170,7 @@
 
 // 'use client';
 'use client';
+'use client';
 
 import { useState, useCallback, memo, useRef } from 'react';
 import { Button, Switch, FormControlLabel, Box, CircularProgress, Typography } from '@mui/material';
@@ -180,7 +181,7 @@ interface ControlPanelProps {
   onClothingUpload: (url: string) => void;
   onToggleClothing: () => void;
   onReset: () => void;
-  showClothing: boolean; // Added to match Home component
+  showClothing: boolean;
 }
 
 const ControlPanel = memo(

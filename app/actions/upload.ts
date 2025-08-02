@@ -35,13 +35,16 @@
 // }
 
 
-// /app/actions/upload.ts
 'use server';
 
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
-import { revalidatePath } from 'next/cache';
-import { put } from '@vercel/blob';
+import { v2 as cloudinary } from 'cloudinary';
+import { UploadApiResponse } from 'cloudinary'; // Import the response type
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function uploadFile(formData: FormData, type: 'avatar' | 'clothing') {
   const file = formData.get('file') as File;
@@ -60,38 +63,33 @@ export async function uploadFile(formData: FormData, type: 'avatar' | 'clothing'
   }
 
   try {
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const fileName = `${Date.now()}-${file.name}`; // Unique filename
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
-    // Use environment variable to determine storage location
-    if (process.env.NODE_ENV === 'development') {
-      const uploadDir = join(process.cwd(), 'public', 'uploads');
-      await mkdir(uploadDir, { recursive: true });
-      const filePath = join(uploadDir, fileName);
-      await writeFile(filePath, buffer);
-      const url = `/uploads/${fileName}`;
-      console.log(`File saved at: ${filePath}, URL: ${url}`);
-      return { url };
-    } else {
-      // Fallback to Vercel Blob for production (e.g., Vercel)
-      const blob = await put(fileName, file, { access: 'public' });
-      console.log(`File saved to Blob for ${type}: ${blob.url}`);
-      return { url: blob.url };
-    }
+    const result = await new Promise<UploadApiResponse>((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        { 
+          upload_preset: process.env.NEXT_PUBLIC_CLOUDINARY_PRESET_NAME,
+          resource_type: 'raw', // For non-image files like .glb/.gltf
+          folder: `fashion-self/${type}`, // Organize by type
+        },
+        (error, result) => {
+          if (error || !result) {
+            reject(error || new Error('Upload result is undefined'));
+            return;
+          }
+          resolve(result);
+        }
+      ).end(buffer);
+    });
+
+    console.log(`File uploaded to Cloudinary for ${type}: ${result.secure_url}`);
+    return { url: result.secure_url };
   } catch (err) {
     console.error('Upload error details:', {
       message: err instanceof Error ? err.message : 'Unknown error',
-      code: (err instanceof Error && 'code' in err) ? (err as NodeJS.ErrnoException).code : undefined,
       stack: err instanceof Error ? err.stack : undefined,
     });
-
-    // Check for file system errors
-    if (err instanceof Error && 'code' in err && (err as NodeJS.ErrnoException).code === 'EROFS' || (err as NodeJS.ErrnoException).code === 'EACCES') {
-      const blob = await put(file.name, file, { access: 'public' });
-      console.log(`Fallback to Blob due to ${err}: ${blob.url}`);
-      return { url: blob.url };
-    }
     throw new Error('Failed to upload file. Check server logs for details.');
   }
 }
