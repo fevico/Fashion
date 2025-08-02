@@ -169,10 +169,9 @@
 
 
 // 'use client';
-
 'use client';
 
-import { useState, useCallback, useRef, memo } from 'react';
+import { useState, useCallback, memo, useRef } from 'react';
 import { Button, Switch, FormControlLabel, Box, CircularProgress, Typography } from '@mui/material';
 import { uploadFile } from '@/app/actions/upload';
 
@@ -181,7 +180,7 @@ interface ControlPanelProps {
   onClothingUpload: (url: string) => void;
   onToggleClothing: () => void;
   onReset: () => void;
-  showClothing: boolean;
+  showClothing: boolean; // Added to match Home component
 }
 
 const ControlPanel = memo(
@@ -189,8 +188,6 @@ const ControlPanel = memo(
     const [uploading, setUploading] = useState<boolean>(false);
     const [dragOver, setDragOver] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-
-    // Refs for file inputs
     const avatarInputRef = useRef<HTMLInputElement>(null);
     const clothingInputRef = useRef<HTMLInputElement>(null);
 
@@ -275,20 +272,19 @@ const ControlPanel = memo(
           onDrop={(e) => handleDrop(e, 'avatar')}
         >
           <Typography>Drop Avatar 3D Model Here (.glb/.gltf only)</Typography>
-          <input
-            type="file"
-            accept=".glb,.gltf"
-            onChange={(e) => handleFileInput(e, 'avatar')}
-            ref={avatarInputRef}
-            style={{ display: 'none' }}
-          />
           <Button
             variant="contained"
-            component="span"
-            onClick={() => avatarInputRef.current?.click()} // Use ref to trigger click
+            component="label"
+            sx={{ mb: 1 }}
             disabled={uploading}
           >
             Upload Avatar
+            <input
+              type="file"
+              hidden
+              accept=".glb,.gltf"
+              onChange={(e) => handleFileInput(e, 'avatar')}
+            />
           </Button>
         </Box>
         <Box
@@ -303,20 +299,19 @@ const ControlPanel = memo(
           onDrop={(e) => handleDrop(e, 'clothing')}
         >
           <Typography>Drop Clothing 3D Model Here (.glb/.gltf only)</Typography>
-          <input
-            type="file"
-            accept=".glb,.gltf"
-            onChange={(e) => handleFileInput(e, 'clothing')}
-            ref={clothingInputRef}
-            style={{ display: 'none' }}
-          />
           <Button
             variant="contained"
-            component="span"
-            onClick={() => clothingInputRef.current?.click()} // Use ref to trigger click
+            component="label"
+            sx={{ mb: 1, ml: 1 }}
             disabled={uploading}
           >
             Upload Clothing
+            <input
+              type="file"
+              hidden
+              accept=".glb,.gltf"
+              onChange={(e) => handleFileInput(e, 'clothing')}
+            />
           </Button>
         </Box>
         <FormControlLabel

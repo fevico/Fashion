@@ -136,7 +136,7 @@ export default function Home() {
         onClothingUpload={handleClothingUpload}
         onToggleClothing={handleToggleClothing}
         onReset={handleReset}
-        showClothing={showClothing} // Pass showClothing prop
+        showClothing={showClothing} // Ensure this prop is passed
       />
     </div>
   );
