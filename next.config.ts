@@ -7,7 +7,6 @@ const nextConfig: NextConfig = {
       sizeLimit: '10mb',
     },
   },
-  output: 'export',
   images: {
     domains: [],
   },

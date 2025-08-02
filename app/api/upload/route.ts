@@ -4,16 +4,16 @@ import { join } from 'path';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
-  const formData = await request.formData();
+  const formData = await request.formData(); 
   const file = formData.get('file') as File;
-
-  if (!file) {
+  
+  if (!file) { 
     return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
   }
 
   if (!file.name.endsWith('.glb') && !file.name.endsWith('.gltf')) {
     return NextResponse.json({ error: 'Only .glb or .gltf files are supported' }, { status: 400 });
-  }
+  }   
 
   const maxSize = 4.5 * 1024 * 1024; // 4.5 MB
   if (file.size > maxSize) {

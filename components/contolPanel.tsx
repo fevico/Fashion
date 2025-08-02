@@ -34,7 +34,7 @@ const ControlPanel = memo(
         const performUpload = async () => {
           try {
             console.log(`Starting upload for ${type}:`, file.name); // Debug log
-            const res = await fetch(`/api/upload?type=${type}`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/upload?type=${type}`, {
               method: 'POST',
               body: formData,
             });
