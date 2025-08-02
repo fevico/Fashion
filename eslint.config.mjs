@@ -11,15 +11,11 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
-  // files: ['**/*.{ts,tsx}'],
-  // rules: {
-  //   'react/react-in-jsx-scope': 'off',  
-  // },
-  // rules: {
-  //   ...nextPlugin.configs['core-web-vitals'].rules,
-  //   'react/react-in-jsx-scope': 'off',
-  //   '@typescript-eslint/explicit-module-boundary-types': 'off', // Optional: adjust as needed
-  // },
+  {
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "off"
+  }
+}
 ];
 
 export default eslintConfig;

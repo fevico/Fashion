@@ -212,7 +212,7 @@ const ControlPanel = memo(
             const res = await fetch('/api/upload', { // Removed ?type= parameter
               method: 'POST',
               body: formData,
-            });
+            }); 
             if (!res.ok) throw new Error('Upload failed');
             const { url } = await res.json();
             console.log(`Uploaded ${type} URL:`, url);
@@ -220,9 +220,9 @@ const ControlPanel = memo(
             else onClothingUpload(url);
           } catch (err) {
             setError('Failed to upload file. Please try again.');
-            console.error('Upload error:', err);
+            console.error('Upload error:', err);    
           } finally {
-            setUploading(false);
+            setUploading(false); 
           }
         };
 
