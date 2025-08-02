@@ -47,59 +47,8 @@
 // };
 
 
-// import { writeFile, mkdir } from 'fs/promises';
-// import { join } from 'path';
-// import { NextResponse } from 'next/server';
-
-// export async function POST(request: Request) {
-//   const formData = await request.formData();
-//   const file = formData.get('file') as File;
-
-//   if (!file) {
-//     return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
-//   }
-
-//   if (!file.name.endsWith('.glb') && !file.name.endsWith('.gltf')) {
-//     return NextResponse.json({ error: 'Only .glb or .gltf files are supported' }, { status: 400 });
-//   }
-
-//   const maxSize = 4.5 * 1024 * 1024; // 4.5 MB
-//   if (file.size > maxSize) {
-//     return NextResponse.json({ error: `File size exceeds 4.5 MB limit (${(file.size / 1024 / 1024).toFixed(2)} MB)` }, { status: 413 });
-//   }
-
-//   try {
-//     const bytes = await file.arrayBuffer();
-//     const buffer = Buffer.from(bytes);
-//     const fileName = `${Date.now()}-${file.name}`; // Unique filename
-//     const uploadDir = join(process.cwd(), 'tmp', 'uploads'); // Use /tmp directory
-//     await mkdir(uploadDir, { recursive: true }); // Create directory if it doesn’t exist
-//     const filePath = join(uploadDir, fileName);
-//     await writeFile(filePath, buffer);
-
-//     const url = `/tmp/uploads/${fileName}`; // Temporary URL (not served)
-//     console.log(`File saved at: ${filePath}, URL: ${url}`);
-//     return NextResponse.json({ url });
-//   } catch (err:any) {
-//     console.error('Upload error details:', {
-//       message: err.message,
-//       code: err.code,
-//       stack: err.stack,
-//     });
-//     if (err.code === 'EROFS' || err.code === 'EACCES') {
-//       return NextResponse.json({ error: 'Cannot write to directory due to server restrictions. Use a file under 4.5 MB or switch to external storage.' }, { status: 403 });
-//     }
-//     return NextResponse.json({ error: 'Failed to upload file. Check server logs for details.' }, { status: 500 });
-//   }
-// }
-
-// export const config = {
-//   api: {
-//     bodyParser: false,
-//   },
-// };
-
-import { put } from '@vercel/blob';
+import { writeFile, mkdir } from 'fs/promises';
+import { join } from 'path';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -120,15 +69,26 @@ export async function POST(request: Request) {
   }
 
   try {
-    const blob = await put(file.name, file, { access: 'public' });
-    console.log(`File saved to Blob: ${blob.url}`);
-    return NextResponse.json({ url: blob.url });
-  } catch (err: unknown) {
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    const fileName = `${Date.now()}-${file.name}`; // Unique filename
+    const uploadDir = join(process.cwd(), 'tmp', 'uploads'); // Use /tmp directory
+    await mkdir(uploadDir, { recursive: true }); // Create directory if it doesn’t exist
+    const filePath = join(uploadDir, fileName);
+    await writeFile(filePath, buffer);
+
+    const url = `/tmp/uploads/${fileName}`; // Temporary URL (not served)
+    console.log(`File saved at: ${filePath}, URL: ${url}`);
+    return NextResponse.json({ url });
+  } catch (err:any) {
     console.error('Upload error details:', {
-      message: err instanceof Error ? err.message : 'Unknown error',
-      code: err instanceof Error ? (err as any).code : undefined,
-      stack: err instanceof Error ? err.stack : undefined,
+      message: err.message,
+      code: err.code,
+      stack: err.stack,
     });
+    if (err.code === 'EROFS' || err.code === 'EACCES') {
+      return NextResponse.json({ error: 'Cannot write to directory due to server restrictions. Use a file under 4.5 MB or switch to external storage.' }, { status: 403 });
+    }
     return NextResponse.json({ error: 'Failed to upload file. Check server logs for details.' }, { status: 500 });
   }
 }
@@ -138,3 +98,4 @@ export const config = {
     bodyParser: false,
   },
 };
+
