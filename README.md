@@ -25,12 +25,14 @@ A web app built for the Threadswift take-home assignment. Users can upload 3D av
 4. Open `http://localhost:3000` in your browser.
 5. Base url for vercel https://fashion-self-beta.vercel.app/
 
+## File Storage
+file are been stored on cloudinary and works fine on production but if needed locally it can be set up via .env 
 ## Deployment
-- Deployed on Vercel: [Insert Vercel URL]
+- Deployed on Vercel: [https://fashion-self-beta.vercel.app/]
 - Note: File uploads may require a storage solution (e.g., Vercel Blob) for production.
 
 ## Screenshots
-i have a 3D sample in my public/uploads/avatar or /clothing
+i have a 3D sample in my public/uploads/avatar or /clothing and also a screenshot would be included in the mail 
 
 ## Notes
 - Clothing "fitting" is simplified by positioning the clothing model at the avatar’s origin.
